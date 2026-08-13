@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Deal Hunter — the true price after coupons & your cards</title>
+<style>
+  :root {
+    --bg: #f6f7fb; --surface: #ffffff; --text: #14161c; --muted: #667085;
+    --border: #e6e8ee; --accent: #4f46e5; --accent-2: #10b981;
+    --win: #ecfdf5; --win-border: #6ee7b7; --shadow: 0 6px 24px rgba(20,22,28,.08);
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d0f14; --surface: #161922; --text: #eef1f6; --muted: #9aa4b2;
+      --border: #262b36; --accent: #818cf8; --accent-2: #34d399;
+      --win: #0c211a; --win-border: #14563f; --shadow: 0 6px 24px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  header { text-align: center; margin-bottom: 28px; }
+  .logo { font-size: 26px; font-weight: 800; letter-spacing: -.02em; }
+  .logo span { color: var(--accent); }
+  .tag { color: var(--muted); margin-top: 6px; }
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 22px;
+  }
+  .row { display: flex; gap: 10px; }
+  input[type=text] {
+    flex: 1; padding: 14px 16px; font-size: 16px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  }
+  input[type=text]:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  button.go {
+    padding: 14px 22px; font-size: 16px; font-weight: 600; border: 0;
+    border-radius: 12px; background: var(--accent); color: #fff; cursor: pointer;
+  }
+  button.go:disabled { opacity: .6; cursor: default; }
+  .label { font-size: 13px; font-weight: 600; color: var(--muted); margin: 18px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); cursor: pointer; font-size: 13px;
+    user-select: none; transition: .12s;
+  }
+  .chip small { color: var(--muted); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip.on small { color: #dfe1fb; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  .status { text-align: center; color: var(--muted); padding: 40px 0; }
+  .spinner {
+    width: 26px; height: 26px; border: 3px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 12px;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 22px 0 12px; }
+  .badge {
+    font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--border); color: var(--muted);
+  }
+  .badge.live { color: var(--accent-2); border-color: var(--accent-2); }
+  .badge.sample { color: #d97706; border-color: #f59e0b; }
+
+  .winner {
+    background: var(--win); border: 1px solid var(--win-border);
+    border-radius: var(--radius); padding: 22px; margin-top: 4px;
+  }
+  .winner .eyebrow { font-size: 12px; font-weight: 700; color: var(--accent-2); text-transform: uppercase; letter-spacing: .06em; }
+  .winner h2 { margin: 6px 0 2px; font-size: 18px; line-height: 1.3; }
+  .price { font-size: 40px; font-weight: 800; letter-spacing: -.02em; margin: 10px 0 2px; }
+  .save { color: var(--accent-2); font-weight: 700; }
+  .pay { margin-top: 10px; color: var(--muted); }
+  .pay b { color: var(--text); }
+  .buy {
+    display: inline-block; margin-top: 16px; padding: 10px 18px; border-radius: 10px;
+    background: var(--accent); color: #fff; text-decoration: none; font-weight: 600;
+  }
+  .math { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 18px; }
+  .math .pill {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 8px 12px; font-size: 13px; text-align: center;
+  }
+  .math .pill small { display: block; color: var(--muted); font-size: 11px; }
+  .math .op { color: var(--muted); font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.win td { background: var(--win); }
+  .plat { font-weight: 600; text-transform: capitalize; }
+  .err { color: #dc2626; text-align: center; padding: 30px 0; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Deal<span>Hunter</span></div>
+    <div class="tag">The <b>true price</b> of a purchase — after the best coupon and the cards you already own.</div>
+  </header>
+
+  <div class="panel">
+    <form id="f" class="row">
+      <input id="q" type="text" placeholder="e.g. HP Victus gaming laptop" autocomplete="off" />
+      <button class="go" id="btn" type="submit">Find the deal</button>
+    </form>
+
+    <div class="label">Which cards do you own? <span style="font-weight:400">(optional — leave empty to consider all)</span></div>
+    <div class="chips" id="cards"></div>
+    <div class="hint">Bank offers stack on top of coupons. Selecting your cards shows <i>your</i> real out-of-pocket price.</div>
+  </div>
+
+  <div id="out"></div>
+
+  <footer>Prototype · prices scraped best-effort, sample data when a site blocks the scraper · not financial advice</footer>
+</div>
+
+<script>
+const inr = n => new Intl.NumberFormat('en-IN', {style:'currency', currency:'INR', maximumFractionDigits:0}).format(n);
+const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
+const selected = new Set();
+
+async function loadCards() {
+  try {
+    const { cards } = await (await fetch('/api/cards')).json();
+    const box = document.getElementById('cards');
+    box.innerHTML = '';
+    cards.forEach(c => {
+      const plat = c.platforms.length ? c.platforms.join(', ') : 'rewards';
+      const chip = el('div', 'chip', `${c.name} <small>· ${plat}</small>`);
+      chip.onclick = () => {
+        chip.classList.toggle('on');
+        selected.has(c.id) ? selected.delete(c.id) : selected.add(c.id);
+      };
+      box.appendChild(chip);
+    });
+  } catch (e) { /* non-fatal */ }
+}
+
+function mathStrip(o) {
+  const wrap = el('div', 'math');
+  const pill = (label, val) => el('div', 'pill', `${inr(val)}<small>${label}</small>`);
+  const op = s => el('span', 'op', s);
+  wrap.append(
+    pill('Listed', o.listed_price), op('−'),
+    pill('Coupon', o.best_option.coupon_discount), op('−'),
+    pill('Instant', o.best_option.instant_discount), op('−'),
+    pill('Reward', o.best_option.reward_value), op('='),
+    (() => { const p = pill('Net price', o.best_option.net_effective); p.style.fontWeight = 700; return p; })()
+  );
+  return wrap;
+}
+
+function render(data) {
+  const out = document.getElementById('out');
+  out.innerHTML = '';
+
+  const rec = data.recommended;
+  if (!rec) {
+    out.appendChild(el('div', 'panel err', 'No priced listings found. Try a more specific product name.'));
+    return;
+  }
+
+  const priced = data.per_platform.filter(p => p.best_option);
+  const winRow = priced.find(p => p.platform === rec.platform);
+  const conf = Math.round((data.match.same_product_confidence || 0) * 100);
+
+  const panel = el('div', 'panel');
+
+  // badges
+  const badges = el('div', 'badges');
+  badges.append(
+    el('span', 'badge ' + (data.source === 'live' ? 'live' : 'sample'),
+       data.source === 'live' ? '● Live prices' : '● Sample data'),
+    el('span', 'badge', `Same-product match: ${conf}%`),
+    el('span', 'badge', `${priced.length} platforms compared`)
+  );
+  panel.appendChild(badges);
+
+  // winner
+  const w = el('div', 'winner');
+  const savePct = Math.round((rec.total_savings / rec.listed_price) * 100);
+  w.innerHTML = `
+    <div class="eyebrow">Best deal · <span style="text-transform:capitalize">${rec.platform}</span></div>
+    <h2>${rec.title}</h2>
+    <div class="price">${inr(rec.net_effective_price)}</div>
+    <div class="save">You save ${inr(rec.total_savings)} (${savePct}%) vs the listed price</div>
+    <div class="pay">Pay with <b>${rec.pay_with}</b>${rec.coupon ? ` · coupon <b>${rec.coupon}</b>` : ''}</div>
+  `;
+  if (winRow) w.appendChild(mathStrip(winRow));
+  const buy = el('a', 'buy'); buy.href = rec.url; buy.target = '_blank'; buy.rel = 'noopener';
+  buy.textContent = `View on ${rec.platform} →`;
+  w.appendChild(buy);
+  panel.appendChild(w);
+
+  // comparison table
+  const table = el('table');
+  table.innerHTML = `<thead><tr>
+    <th>Platform</th><th class="num">Listed</th><th>Best card</th>
+    <th>Coupon</th><th class="num">Net price</th><th class="num">You save</th>
+  </tr></thead>`;
+  const tb = el('tbody');
+  priced.sort((a, b) => a.best_option.net_effective - b.best_option.net_effective);
+  priced.forEach(p => {
+    const tr = el('tr', p.platform === rec.platform ? 'win' : '');
+    tr.innerHTML = `
+      <td class="plat">${p.platform}</td>
+      <td class="num">${inr(p.listed_price)}</td>
+      <td>${p.best_option.card}</td>
+      <td>${p.best_option.coupon || '—'}</td>
+      <td class="num"><b>${inr(p.best_option.net_effective)}</b></td>
+      <td class="num" style="color:var(--accent-2)">${inr(p.total_savings)}</td>`;
+    tb.appendChild(tr);
+  });
+  table.appendChild(tb);
+  panel.appendChild(table);
+
+  out.appendChild(panel);
+}
+
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('btn');
+  const out = document.getElementById('out');
+  btn.disabled = true;
+  out.innerHTML = '<div class="panel"><div class="status"><div class="spinner"></div>Scraping platforms, matching, stacking coupons & cards…</div></div>';
+  try {
+    const params = new URLSearchParams({ query: q });
+    if (selected.size) params.set('cards', [...selected].join(','));
+    const res = await fetch('/api/deal?' + params.toString());
+    if (!res.ok) throw new Error('request failed');
+    render(await res.json());
+  } catch (err) {
+    out.innerHTML = '<div class="panel err">Something went wrong fetching the deal. Try again.</div>';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+loadCards();
+</script>
+</body>
+</html>

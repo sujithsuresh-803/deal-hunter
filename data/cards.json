@@ -1,0 +1,51 @@
+[
+  {
+    "name": "HDFC Millennia Credit Card",
+    "network": "Visa",
+    "instant_discounts": {
+      "amazon": {"percent": 10, "max_discount": 1500, "min_order": 5000},
+      "flipkart": {"percent": 5, "max_discount": 1000, "min_order": 5000}
+    },
+    "reward_rate": 0.05,
+    "reward_cap": 1000,
+    "notes": "5% cashback on Amazon/Flipkart, 1% elsewhere. Cashback as CashPoints."
+  },
+  {
+    "name": "Axis Bank ACE Credit Card",
+    "network": "Visa",
+    "instant_discounts": {
+      "flipkart": {"percent": 10, "max_discount": 1750, "min_order": 5000}
+    },
+    "reward_rate": 0.02,
+    "reward_cap": 500,
+    "notes": "2% flat reward value on most spends; strong on Flipkart sale events."
+  },
+  {
+    "name": "ICICI Amazon Pay Credit Card",
+    "network": "Visa",
+    "instant_discounts": {
+      "amazon": {"percent": 5, "max_discount": 2000, "min_order": 0}
+    },
+    "reward_rate": 0.03,
+    "reward_cap": null,
+    "notes": "5% back on Amazon for Prime members (as Amazon Pay balance)."
+  },
+  {
+    "name": "SBI Cashback Credit Card",
+    "network": "Visa",
+    "instant_discounts": {},
+    "reward_rate": 0.05,
+    "reward_cap": 5000,
+    "notes": "5% cashback on all online spends (incl. HP Store), capped monthly."
+  },
+  {
+    "name": "Flipkart Axis Bank Credit Card",
+    "network": "Mastercard",
+    "instant_discounts": {
+      "flipkart": {"percent": 5, "max_discount": 4000, "min_order": 0}
+    },
+    "reward_rate": 0.015,
+    "reward_cap": null,
+    "notes": "5% unlimited cashback on Flipkart, 1.5% elsewhere."
+  }
+]

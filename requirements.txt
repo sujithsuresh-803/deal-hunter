@@ -1,0 +1,20 @@
+# Core
+anthropic>=0.69          # Claude API (the agent brain)
+mcp>=1.2                 # Model Context Protocol server + client SDK
+
+# Scraping
+httpx>=0.27
+beautifulsoup4>=4.12
+lxml>=5.0
+selectolax>=0.3          # fast HTML parsing fallback
+
+# Web app (FastAPI backend + static front-end)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+
+# Config
+python-dotenv>=1.0
+
+# Optional: JS-rendered pages / anti-bot heavy sites.
+# Install separately with:  pip install playwright && playwright install chromium
+# playwright>=1.45
