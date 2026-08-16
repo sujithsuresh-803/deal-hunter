@@ -77,6 +77,16 @@ uvicorn webapp.app:app --reload
 Then open http://127.0.0.1:8000. No API key needed — the web app talks to the
 engine directly (the Claude agent is the separate CLI below).
 
+**Streamlit app** (same engine, one-file UI — this is the deployable demo):
+
+```bash
+streamlit run streamlit_app.py
+```
+
+Deploy free on **Streamlit Community Cloud**: push this repo to GitHub →
+[share.streamlit.io](https://share.streamlit.io) → *New app* → pick this repo and
+`streamlit_app.py` → Deploy. No API key needed (the UI uses the deterministic engine).
+
 **Full agent** (natural language in, recommendation out — uses Claude Opus 5):
 
 ```bash

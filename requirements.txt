@@ -12,6 +12,9 @@ selectolax>=0.3          # fast HTML parsing fallback
 fastapi>=0.110
 uvicorn[standard]>=0.29
 
+# Streamlit front-end (deploys free on Streamlit Community Cloud)
+streamlit>=1.30
+
 # Config
 python-dotenv>=1.0
 
